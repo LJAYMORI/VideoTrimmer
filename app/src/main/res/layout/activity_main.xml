@@ -12,19 +12,30 @@
 		android:layout_height="match_parent"
 		app:use_controller="false" />
 
-	<Button
-		android:id="@+id/load_button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="start|left"
-		android:text="Load"/>
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content">
 
-	<Button
-		android:id="@+id/encode_button"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_gravity="end|right"
-		android:text="Encode"/>
+		<Button
+			android:id="@+id/load_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Load"/>
+
+		<Button
+			android:id="@+id/mute_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="MUTE"/>
+
+		<Button
+			android:id="@+id/encode_button"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Encode"/>
+
+	</LinearLayout>
+
 
 	<com.jonguk.videotrimmer.MediaControllerView
 		android:id="@+id/media_controller_view"

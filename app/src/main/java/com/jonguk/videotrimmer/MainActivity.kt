@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
+import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import com.google.android.exoplayer2.C
@@ -17,7 +18,11 @@ import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
 import com.google.android.exoplayer2.source.BehindLiveWindowException
 import com.google.android.exoplayer2.source.ExtractorMediaSource
 import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.source.dash.DashMediaSource
+import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource
+import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelection
@@ -35,6 +40,7 @@ import java.net.CookiePolicy
 
 class MainActivity : AppCompatActivity() {
     private val loadView by lazy { findViewById<View>(R.id.load_button) }
+    private val muteView by lazy { findViewById<View>(R.id.mute_button) }
     private val videoView by lazy { findViewById<SimpleExoPlayerView>(R.id.exo_player_view) }
     private val mediaControlView by lazy { findViewById<MediaControllerView>(R.id.media_controller_view) }
 
@@ -43,11 +49,15 @@ class MainActivity : AppCompatActivity() {
     private var player: SimpleExoPlayer? = null
     private var mediaDataSourceFactory: DataSource.Factory? = null
     private var trackSelector: DefaultTrackSelector? = null
-    private var lastSeenTrackGroupArray: TrackGroupArray? = null
 
     private var shouldAutoPlay: Boolean = false
     private var resumeWindow: Int? = 0
     private var resumePosition: Long? = 0L
+
+    private var audioRendIndex = -1
+    private var audioMute: Boolean = false
+    private var videoRenderIndex = -1
+    private var videoTurnOff: Boolean = false
 
     companion object {
         @JvmStatic val REQ_CODE_MAIN = 123
@@ -63,9 +73,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         shouldAutoPlay = true
         clearResumePosition()
-        mediaDataSourceFactory = DefaultDataSourceFactory(this, BANDWIDTH_METER,
-                DefaultHttpDataSourceFactory(Util.getUserAgent(this, application.packageName),
-                        BANDWIDTH_METER))
+        mediaDataSourceFactory = buildDataSourceFactory()
         mainHandler = Handler()
         val currentHandler = CookieHandler.getDefault()
         if (currentHandler != defaultCookieManager) {
@@ -75,7 +83,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        videoView.requestFocus()
+        muteView.setOnClickListener{
+            if (audioRendIndex >= 0) {
+                audioMute = !audioMute
+                trackSelector?.setRendererDisabled(audioRendIndex, audioMute)
+            }
+        }
+
 //        val disposable = RxView.clicks(loadView)
 //                .compose(RxPermissions(this).ensure(Manifest.permission.READ_EXTERNAL_STORAGE))
 //                .subscribe({
@@ -125,15 +139,34 @@ class MainActivity : AppCompatActivity() {
                 REQ_CODE_MAIN -> {
                     val uriPath = data.extras?.getString(Constant.VIDEO_URI)
                     uriPath?.let {
-                        player?.prepare(buildMediaSource(Uri.parse(it)), true, false)
+                        player?.prepare(buildMediaSource(Uri.parse(it), null), true, false)
                     }
                 }
             }
         }
     }
 
-    private fun buildMediaSource(uri: Uri): MediaSource = ExtractorMediaSource(uri,
-            mediaDataSourceFactory, DefaultExtractorsFactory(), mainHandler, eventLogger)
+    private fun buildMediaSource(uri: Uri, overrideExtension: String?): MediaSource {
+        @C.ContentType val type = if (TextUtils.isEmpty(overrideExtension))
+            Util.inferContentType(uri)
+        else
+            Util.inferContentType("." + overrideExtension)
+
+        return when(type) {
+            C.TYPE_SS -> SsMediaSource(uri, buildDataSourceFactory(),
+                    DefaultSsChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger)
+            C.TYPE_DASH -> DashMediaSource(uri, buildDataSourceFactory(),
+                    DefaultDashChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger)
+            C.TYPE_HLS -> HlsMediaSource(uri, mediaDataSourceFactory, mainHandler, eventLogger)
+            C.TYPE_OTHER -> ExtractorMediaSource(uri,
+                    mediaDataSourceFactory, DefaultExtractorsFactory(), mainHandler, eventLogger)
+            else -> throw IllegalStateException("Unsupported type: $type")
+        }
+    }
+
+    private fun buildDataSourceFactory() = DefaultDataSourceFactory(this, BANDWIDTH_METER,
+            DefaultHttpDataSourceFactory(Util.getUserAgent(this, application.packageName),
+                    BANDWIDTH_METER))
 
     private fun initializePlayer() {
         // TODO local video
@@ -145,32 +178,29 @@ class MainActivity : AppCompatActivity() {
             val adaptiveTrackSelection: TrackSelection.Factory =
                     AdaptiveTrackSelection.Factory(BANDWIDTH_METER)
             trackSelector = DefaultTrackSelector(adaptiveTrackSelection)
-            lastSeenTrackGroupArray = null
             eventLogger = EventLogger(trackSelector)
 
-
-//            player = ExoPlayerFactory.newSimpleInstance(renderersFactory, trackSelector)
             playerEventListener = PlayerEventListener.Builder()
                     .trackSelector(trackSelector)
-                    .lastSeenTrackGroupArray(lastSeenTrackGroupArray)
                     .updateResumePositionCallback { updateResumePosition() }
                     .showControlCallback { showControls() }
-                    .updateButtonVisibilitiesCallback { updateButtonVisibilities() }
+                    .updateButtonVisibilitiesCallback { updateRenderIndices() }
                     .initializePlayerCallback { initializePlayer() }
                     .clearResumePositionCallback { clearResumePosition() }
                     .isBehindLiveWindowCallback { isBehindLiveWindow(it) }
                     .messageCallback { resId, arg -> showToast(resId, arg) }
                     .build()
-            player = ExoPlayerFactory.newSimpleInstance(this, trackSelector)
-            player?.addListener(playerEventListener)
-            player?.addListener(eventLogger)
-            player?.addMetadataOutput(eventLogger)
-            player?.setAudioDebugListener(eventLogger)
-            player?.setVideoDebugListener(eventLogger)
+
+            player = ExoPlayerFactory.newSimpleInstance(this, trackSelector).apply {
+                addListener(playerEventListener)
+                addListener(eventLogger)
+                addMetadataOutput(eventLogger)
+                setAudioDebugListener(eventLogger)
+                setVideoDebugListener(eventLogger)
+            }
 
             videoView.player = player
             player?.playWhenReady = shouldAutoPlay
-
         }
 
         val haveResumePosition = resumeWindow != C.INDEX_UNSET
@@ -178,10 +208,11 @@ class MainActivity : AppCompatActivity() {
             player?.seekTo(resumeWindow ?: 0, resumePosition ?: 0)
         }
 
-        val uri = Uri.parse("http://www.sample-videos.com/video/mp4/480/big_buck_bunny_480p_1mb.mp4")
-        player?.prepare(buildMediaSource(uri), !haveResumePosition, false)
+//        val uri = Uri.parse("http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4")
+        val uri = Uri.parse("http://cdn2.teads.tv/scala/1562/285efe2ff80f8bd811c8a638eb901f2c/320.mp4")
+        player?.prepare(buildMediaSource(uri, null), !haveResumePosition, false)
         playerEventListener?.setErrorState(false)
-        updateButtonVisibilities()
+        updateRenderIndices()
     }
 
     private fun releasePlayer() {
@@ -204,21 +235,16 @@ class MainActivity : AppCompatActivity() {
         mediaControlView?.visibility = View.VISIBLE
     }
 
-    private fun updateButtonVisibilities() {
+    private fun updateRenderIndices() {
         player?.let {
             val mappedTrackInfo = trackSelector?.currentMappedTrackInfo
             mappedTrackInfo?.let {
                 for (i in 0 until it.length) {
                     val groups = it.getTrackGroups(i)
                     if (groups.length != 0) {
-                        val label: Int = when (player?.getRendererType(i)) {
-                            C.TRACK_TYPE_AUDIO -> R.string.audio
-                            C.TRACK_TYPE_VIDEO -> R.string.video
-                            C.TRACK_TYPE_TEXT -> R.string.text
-                            else -> 0
-                        }
-                        if (label != 0) {
-                            // TODO something..
+                        when (player?.getRendererType(i)) {
+                            C.TRACK_TYPE_AUDIO -> audioRendIndex = i
+                            C.TRACK_TYPE_VIDEO -> videoRenderIndex = i
                         }
                     }
                 }

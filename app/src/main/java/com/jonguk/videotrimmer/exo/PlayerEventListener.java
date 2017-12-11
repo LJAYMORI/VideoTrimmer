@@ -165,7 +165,6 @@ public class PlayerEventListener extends Player.DefaultEventListener {
 
     public static class Builder {
         private DefaultTrackSelector trackSelector;
-        private TrackGroupArray lastSeenTrackGroupArray;
 
         private Runnable updateResumePositionCallback;
         private Runnable showControlCallback;
@@ -177,11 +176,6 @@ public class PlayerEventListener extends Player.DefaultEventListener {
 
         public Builder trackSelector(DefaultTrackSelector trackSelector) {
             this.trackSelector = trackSelector;
-            return this;
-        }
-
-        public Builder lastSeenTrackGroupArray(TrackGroupArray lastSeenTrackGroupArray) {
-            this.lastSeenTrackGroupArray = lastSeenTrackGroupArray;
             return this;
         }
 
@@ -227,7 +221,6 @@ public class PlayerEventListener extends Player.DefaultEventListener {
 
             PlayerEventListener listener = new PlayerEventListener();
             listener.trackSelector = trackSelector;
-            listener.lastSeenTrackGroupArray = lastSeenTrackGroupArray;
             listener.updateResumePositionCallback = updateResumePositionCallback;
             listener.showControlCallback = showControlCallback;
             listener.updateButtonVisibilitiesCallback = updateButtonVisibilitiesCallback;
