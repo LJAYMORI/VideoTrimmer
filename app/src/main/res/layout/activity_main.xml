@@ -1,31 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	tools:context="com.jonguk.videotrimmer.MainActivity">
 
-	<com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-		android:id="@+id/video_layout"
+	<com.google.android.exoplayer2.ui.SimpleExoPlayerView
+		android:id="@+id/exo_player_view"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		android:layout_gravity="center">
-
-		<SurfaceView
-			android:id="@+id/video_surface_view"
-			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:background="@android:color/black"
-			tools:visibility="invisible"/>
-
-		<View
-			android:id="@+id/play_pause_view"
-			android:layout_width="70dp"
-			android:layout_height="70dp"
-			android:background="@mipmap/ic_launcher"
-			android:layout_gravity="center"/>
-
-	</com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
+		app:use_controller="false" />
 
 	<Button
 		android:id="@+id/load_button"

@@ -1,3 +1,17 @@
 <resources>
 	<string name="app_name">VideoTrimmer</string>
+
+	<string name="audio">Audio</string>
+	<string name="video">Video</string>
+	<string name="text">Text</string>
+
+	<string name="error_drm_not_supported">Protected content not supported on API levels below 18</string>
+	<string name="error_drm_unsupported_scheme">This device does not support the required DRM scheme</string>
+	<string name="error_drm_unknown">An unknown DRM error occurred</string>
+	<string name="error_no_decoder">This device does not provide a decoder for %1$s</string>
+	<string name="error_no_secure_decoder">This device does not provide a secure decoder for %1$s</string>
+	<string name="error_querying_decoders">Unable to query device decoders</string>
+	<string name="error_instantiating_decoder">Unable to instantiate decoder %1$s</string>
+	<string name="error_unsupported_video">Media includes video tracks, but none are playable by this device</string>
+	<string name="error_unsupported_audio">Media includes audio tracks, but none are playable by this device</string>
 </resources>
