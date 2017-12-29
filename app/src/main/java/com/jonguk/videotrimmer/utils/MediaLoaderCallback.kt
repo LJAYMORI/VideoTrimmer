@@ -1,27 +1,28 @@
-package com.jonguk.videotrimmer
+package com.jonguk.videotrimmer.utils
 
 import android.content.Context
 import android.database.Cursor
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.support.v4.app.LoaderManager
 import android.support.v4.content.CursorLoader
 import android.support.v4.content.Loader
+import java.util.*
 
 /**
  * Created by Jonguk on 2017. 12. 5..
  */
 abstract class MediaLoaderCallback(private val context: Context) : LoaderManager.LoaderCallbacks<Cursor> {
     companion object {
-        @JvmStatic val PROJECTION_PRE_JB = arrayOf(
-                MediaStore.Files.FileColumns._ID,
-                MediaStore.Files.FileColumns.DATA,
-                MediaStore.Files.FileColumns.MEDIA_TYPE,
-                MediaStore.Files.FileColumns.MIME_TYPE,
-                MediaStore.Images.ImageColumns.ORIENTATION,
-                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
-                MediaStore.Video.VideoColumns.DURATION)
+//        @JvmStatic val PROJECTION_PRE_JB = arrayOf(
+//                MediaStore.Files.FileColumns._ID,
+//                MediaStore.Files.FileColumns.DATA,
+//                MediaStore.Files.FileColumns.MEDIA_TYPE,
+//                MediaStore.Files.FileColumns.MIME_TYPE,
+//                MediaStore.Images.ImageColumns.ORIENTATION,
+//                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+//                MediaStore.Video.VideoColumns.DURATION)
 
         @JvmStatic val PROJECTION = arrayOf(
                 MediaStore.Files.FileColumns._ID,
@@ -35,10 +36,20 @@ abstract class MediaLoaderCallback(private val context: Context) : LoaderManager
                 MediaStore.Video.VideoColumns.DURATION)
 
         @JvmStatic val SELECTION = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
-                + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE)
+                + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
     }
 
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> =
+            CursorLoader(context, MediaStore.Files.getContentUri("external"),
+                    PROJECTION, SELECTION, null,
+                    MediaStore.Images.Media.DATE_MODIFIED + " DESC")
+
     override fun onLoadFinished(loader: Loader<Cursor>?, data: Cursor?) {
+        val list = ArrayList<Uri>()
+        if (data?.moveToFirst() == true) {
+            val cr = context.contentResolver
+
+        }
 //        val map = MediaListMap()
 //        if (data?.moveToFirst() == true) {
 //            val cr = context.contentResolver
@@ -56,21 +67,8 @@ abstract class MediaLoaderCallback(private val context: Context) : LoaderManager
 //        onLoadFinished(map)
     }
 
+    override fun onLoaderReset(loader: Loader<Cursor>?) {}
 
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> =
-            CursorLoader(context,
-                    MediaStore.Files.getContentUri("external"),
-                    getProjection(), SELECTION, null,
-                    MediaStore.Images.Media.DATE_MODIFIED + " DESC")
-
-    override fun onLoaderReset(loader: Loader<Cursor>?) {
-
-    }
-
-    private fun getProjection() =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) PROJECTION
-            else PROJECTION_PRE_JB
-
-    abstract fun onLoadFinished()
+    abstract fun onLoadFinished(list: ArrayList<Uri>)
 
 }

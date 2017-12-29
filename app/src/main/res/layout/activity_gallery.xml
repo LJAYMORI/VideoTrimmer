@@ -6,7 +6,7 @@
 	android:layout_height="match_parent">
 
 	<android.support.v7.widget.RecyclerView
-		android:id="@+id/recyclerview"
+		android:id="@+id/gallery_recyclerview"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
 		android:orientation="vertical"
@@ -19,7 +19,7 @@
 		tools:listitem="@layout/item_gallery"/>
 
 	<Button
-		android:id="@+id/video_load_view"
+		android:id="@+id/gallery_load_view"
 		android:layout_width="0dp"
 		android:layout_height="wrap_content"
 		android:text="LOAD"

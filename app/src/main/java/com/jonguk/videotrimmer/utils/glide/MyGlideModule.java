@@ -1,4 +1,4 @@
-package com.jonguk.videotrimmer.glide;
+package com.jonguk.videotrimmer.utils.glide;
 
 import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;

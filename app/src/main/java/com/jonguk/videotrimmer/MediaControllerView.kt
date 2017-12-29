@@ -22,16 +22,6 @@ class MediaControllerView
     private val allTimeView by lazy { findViewById<TextView>(R.id.all_time_view) }
     private val expandView by lazy { findViewById<View>(R.id.expand_view) }
 
-    fun setCurrentTime(sec: Int) {
-        currentTimeView.text = "$sec"
-    }
 
-    fun setAllTime(sec: Int) {
-        allTimeView.text = "$sec"
-    }
-
-    fun onClickExpandView(listener: View.OnClickListener) {
-        expandView.setOnClickListener(listener)
-    }
 
 }

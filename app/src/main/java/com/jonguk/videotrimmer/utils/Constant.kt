@@ -1,4 +1,4 @@
-package com.jonguk.videotrimmer
+package com.jonguk.videotrimmer.utils
 
 /**
  * Created by Jonguk on 2017. 12. 5..
