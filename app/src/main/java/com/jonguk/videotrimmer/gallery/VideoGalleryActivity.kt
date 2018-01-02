@@ -15,10 +15,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.jonguk.videotrimmer.R
 import com.jonguk.videotrimmer.utils.MediaLoaderCallback.Companion.PROJECTION
 import com.jonguk.videotrimmer.utils.MediaLoaderCallback.Companion.SELECTION
-import com.jonguk.videotrimmer.utils.glide.GlideApp
 import kotlinx.android.synthetic.main.activity_gallery.*
 
 /**
@@ -63,7 +63,7 @@ class VideoGalleryActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: GalleryViewHolder?, position: Int) {
             holder?.apply {
                 val data = items[position]
-                GlideApp.with(itemView.context)
+                Glide.with(itemView.context)
                         .load(data.thumbnail)
                         .into(thumbnail)
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<!-- RangeTrimView -->
+	<declare-styleable name="RangeTrimView">
+		<attr name="range_trimmer_sidePadding" format="dimension" />
+	</declare-styleable>
+
+</resources>

@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
-import android.view.View
 import android.widget.Toast
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException
@@ -43,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val loadView by lazy { load_button }
     private val muteView by lazy { mute_button }
     private val videoView by lazy { exo_player_view }
-    private val mediaControlView by lazy { media_controller_view }
+//    private val mediaControlView by lazy { media_controller_view }
 
     private var mainHandler: Handler? = null
     private var eventLogger: EventLogger? = null
@@ -227,7 +226,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showControls() {
-        mediaControlView?.visibility = View.VISIBLE
+//        mediaControlView?.visibility = View.VISIBLE
     }
 
     private fun updateRenderIndices() {

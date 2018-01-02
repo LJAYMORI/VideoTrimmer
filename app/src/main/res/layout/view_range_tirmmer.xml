@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	tools:background="@android:color/black">
+
+	<TextView
+		android:id="@+id/range_trimmer_start_time_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="@android:color/white"
+		android:visibility="invisible"
+		app:layout_constraintStart_toStartOf="@id/range_trimmer_start_handle_view"
+		tools:text="00:00"
+		tools:visibility="visible" />
+
+	<TextView
+		android:id="@+id/range_trimmer_end_time_view"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:textColor="@android:color/white"
+		android:visibility="invisible"
+		app:layout_constraintEnd_toEndOf="@id/range_trimmer_end_handle_view"
+		tools:text="01:23"
+		tools:visibility="visible" />
+
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/range_trimmer_thumbnails_recycler"
+		android:layout_width="match_parent"
+		android:layout_height="@dimen/range_trim_thumbnails_default_height"
+		app:layout_constraintTop_toBottomOf="@id/range_trimmer_start_time_view" />
+
+	<View
+		android:id="@+id/range_trimmer_start_gradient_view"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:background="#55d2d2d2"
+		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_start_handle_view"
+		app:layout_constraintEnd_toStartOf="@id/range_trimmer_start_handle_view"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="@id/range_trimmer_start_handle_view"
+		tools:background="#50ff0000" />
+
+	<View
+		android:id="@+id/range_trimmer_end_gradient_view"
+		android:layout_width="0dp"
+		android:layout_height="0dp"
+		android:background="#55d2d2d2"
+		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_end_handle_view"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toEndOf="@id/range_trimmer_end_handle_view"
+		app:layout_constraintTop_toTopOf="@id/range_trimmer_end_handle_view"
+		tools:background="#5000ff00" />
+
+	<ImageView
+		android:id="@+id/range_trimmer_start_handle_view"
+		android:layout_width="10dp"
+		android:layout_height="0dp"
+		android:layout_marginLeft="@dimen/range_trim_thumbnails_default_side_padding"
+		android:layout_marginStart="@dimen/range_trim_thumbnails_default_side_padding"
+		android:scaleType="fitXY"
+		android:src="@drawable/drawable_range_trimmer_handle"
+		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_thumbnails_recycler"
+		app:layout_constraintStart_toStartOf="@id/range_trimmer_start_gradient_view"
+		app:layout_constraintTop_toTopOf="@id/range_trimmer_thumbnails_recycler" />
+
+	<ImageView
+		android:id="@+id/range_trimmer_end_handle_view"
+		android:layout_width="10dp"
+		android:layout_height="0dp"
+		android:layout_marginEnd="@dimen/range_trim_thumbnails_default_side_padding"
+		android:layout_marginRight="@dimen/range_trim_thumbnails_default_side_padding"
+		android:scaleType="fitXY"
+		android:src="@drawable/drawable_range_trimmer_handle"
+		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_thumbnails_recycler"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintTop_toTopOf="@id/range_trimmer_thumbnails_recycler" />
+
+	<View
+		android:id="@+id/range_trimmer_current_handle_view"
+		android:layout_width="5dp"
+		android:layout_height="0dp"
+		android:background="@drawable/drawable_range_trimmer_current_handle"
+		android:scaleType="center"
+		android:visibility="invisible"
+		app:layout_constraintHorizontal_bias="0"
+		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_thumbnails_recycler"
+		app:layout_constraintEnd_toStartOf="@id/range_trimmer_end_handle_view"
+		app:layout_constraintStart_toEndOf="@id/range_trimmer_start_handle_view"
+		app:layout_constraintTop_toTopOf="@id/range_trimmer_thumbnails_recycler"
+		tools:visibility="visible"/>
+
+</android.support.constraint.ConstraintLayout>
