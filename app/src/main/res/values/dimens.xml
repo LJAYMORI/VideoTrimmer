@@ -3,4 +3,5 @@
 	<dimen name="range_trim_thumbnails_default_side_padding">15dp</dimen>
 	<dimen name="range_trim_thumbnails_default_height">100dp</dimen>
 	<dimen name="range_trim_thumbnails_default_width_of_start_and_end">40dp</dimen>
+	<dimen name="range_trim_thumbnails_default_width">55dp</dimen>
 </resources>

@@ -14,7 +14,7 @@
 		android:layout_marginStart="9dp"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent"
-		tools:src="@mipmap/ic_launcher" />
+		android:src="@mipmap/ic_launcher" />
 
 	<TextView
 		android:id="@+id/gallery_item_name"

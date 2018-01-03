@@ -10,4 +10,7 @@
 	<string name="error_instantiating_decoder">Unable to instantiate decoder %1$s</string>
 	<string name="error_unsupported_video">Media includes video tracks, but none are playable by this device</string>
 	<string name="error_unsupported_audio">Media includes audio tracks, but none are playable by this device</string>
+
+	<string name="main_video_play">Play</string>
+	<string name="main_video_pause">Pause</string>
 </resources>

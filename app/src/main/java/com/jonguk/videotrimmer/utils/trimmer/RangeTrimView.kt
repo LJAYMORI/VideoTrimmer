@@ -1,4 +1,4 @@
-package com.jonguk.videotrimmer
+package com.jonguk.videotrimmer.utils.trimmer
 
 import android.content.Context
 import android.net.Uri
@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import com.jonguk.videotrimmer.R
 import kotlinx.android.synthetic.main.view_range_tirmmer.view.*
 
 /**
@@ -26,11 +27,12 @@ class RangeTrimView
     private val endGradientView by lazy { range_trimmer_end_gradient_view }
 
     private val recyclerView by lazy { range_trimmer_thumbnails_recycler }
-    private val layoutManager by lazy { LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) }
+    private val thumbnailLayoutManager by lazy { LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) }
+    private val thumbnailAdapter: ThumbnailsAdapter
 
     private var minWidthOfStartWithEnd: Int = 0
     private var maxWidthOfStartWithEnd: Int = 0
-
+    private var thumbnailWidth: Int = 0
     private var trimmerSidePadding: Int = 0
 
     var handleChangeListener: OnHandleChangeListener? = null
@@ -44,11 +46,18 @@ class RangeTrimView
                     resources.getDimensionPixelSize(R.dimen.range_trim_thumbnails_default_side_padding))
             minWidthOfStartWithEnd = a.getInt(R.styleable.RangeTrimView_range_trimmer_widthOfStartAndEnd,
                     resources.getDimensionPixelSize(R.dimen.range_trim_thumbnails_default_width_of_start_and_end))
-
+            thumbnailWidth = a.getInt(R.styleable.RangeTrimView_range_trimmer_thumbnailWidth,
+                    resources.getDimensionPixelSize(R.dimen.range_trim_thumbnails_default_width))
             // TODO think..
             maxWidthOfStartWithEnd = minWidthOfStartWithEnd shl 2
 
             a.recycle()
+        }
+
+        thumbnailAdapter = ThumbnailsAdapter(thumbnailWidth)
+        recyclerView.apply {
+            layoutManager = thumbnailLayoutManager
+            adapter = thumbnailAdapter
         }
 
         startHandleView.setOnTouchListener { handle, event ->
@@ -70,17 +79,15 @@ class RangeTrimView
 
     var videoUri: Uri? = null
 
+
     private fun updateStartHandleLocation(handle: View, x: Int) {
         val parentRight = this.right
         val handleWidth = handle.width
         val handleTop = handle.top
         val handleBottom = handle.bottom
-        val handleLeft = when {
-            x < trimmerSidePadding -> trimmerSidePadding
-            x > parentRight - trimmerSidePadding - minWidthOfStartWithEnd - handleWidth ->
-                parentRight - trimmerSidePadding - minWidthOfStartWithEnd - handleWidth
-            else -> x
-        }
+        val handleLeft = Math.min(
+                Math.max(x, trimmerSidePadding),
+                parentRight - trimmerSidePadding - minWidthOfStartWithEnd - handleWidth)
         val handleRight = handleLeft + handleWidth
         handle.layout(handleLeft, handleTop, handleRight, handleBottom)
         startGradientView.layout(0, handleTop, handleRight, handleBottom)
@@ -110,13 +117,9 @@ class RangeTrimView
         val handleWidth = handle.width
         val handleTop = handle.top
         val handleBottom = handle.bottom
-        val handleLeft = when {
-            x < trimmerSidePadding + minWidthOfStartWithEnd + startHandleWidth ->
-                trimmerSidePadding + minWidthOfStartWithEnd + startHandleWidth
-            x > parentRight - trimmerSidePadding - handleWidth ->
-                parentRight - trimmerSidePadding - handleWidth
-            else -> x
-        }
+        val handleLeft = Math.min(
+                Math.max(x, trimmerSidePadding + minWidthOfStartWithEnd + startHandleWidth),
+                parentRight - trimmerSidePadding - handleWidth)
         val handleRight = handleLeft + handleWidth
         handle.layout(handleLeft, handleTop, handleRight, handleBottom)
         endGradientView.layout(handleLeft, handleTop, parentRight, handleBottom)

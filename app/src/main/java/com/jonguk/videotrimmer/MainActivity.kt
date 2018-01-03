@@ -1,5 +1,6 @@
 package com.jonguk.videotrimmer
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
+import android.view.View
 import android.widget.Toast
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlaybackException
@@ -30,9 +32,13 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
+import com.jakewharton.rxbinding2.view.RxView
+import com.jonguk.videotrimmer.gallery.VideoGalleryActivity
 import com.jonguk.videotrimmer.utils.Constant
 import com.jonguk.videotrimmer.utils.exo.EventLogger
 import com.jonguk.videotrimmer.utils.exo.PlayerEventListener
+import com.tbruyelle.rxpermissions2.RxPermissions
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_main.*
 import java.net.CookieHandler
 import java.net.CookieManager
@@ -42,6 +48,8 @@ class MainActivity : AppCompatActivity() {
     private val loadView by lazy { load_button }
     private val muteView by lazy { mute_button }
     private val videoView by lazy { exo_player_view }
+    private val playOrPauseView by lazy { play_or_pause_view }
+    private val rangeTrimView by lazy { range_trim_view }
 //    private val mediaControlView by lazy { media_controller_view }
 
     private var mainHandler: Handler? = null
@@ -59,9 +67,15 @@ class MainActivity : AppCompatActivity() {
     private var videoRenderIndex = -1
     private var videoTurnOff: Boolean = false
 
-    companion object {
-        @JvmStatic val REQ_CODE_MAIN = 123
+    private var videoUri: Uri? = null
+        private set(value) {
+            field = value
+            playOrPauseView.visibility = if (value == null) View.GONE else View.VISIBLE
+        }
 
+    private val disposable = CompositeDisposable()
+
+    companion object {
         private val defaultCookieManager: CookieManager by lazy { CookieManager() }
         private val BANDWIDTH_METER = DefaultBandwidthMeter()
     }
@@ -89,11 +103,26 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        val disposable = RxView.clicks(loadView)
-//                .compose(RxPermissions(this).ensure(Manifest.permission.READ_EXTERNAL_STORAGE))
-//                .subscribe({
-//                    startActivityForResult(VideoGalleryActivity.newIntent(this), REQ_CODE_MAIN)
-//                }, {})
+        disposable.add(RxView.clicks(playOrPauseView)
+                .map { !playOrPauseView.isChecked }
+                .subscribe({
+                    if (it) {
+                        playOrPauseView.setText(R.string.main_video_pause)
+                        player?.playWhenReady = true
+                    } else {
+                        playOrPauseView.setText(R.string.main_video_play)
+                        player?.playWhenReady = false
+                    }
+                    playOrPauseView.toggle()
+                }, {}))
+
+        disposable.add(RxView.clicks(loadView)
+                .switchMap { (RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE)) }
+                .filter { hasPermission -> hasPermission }
+                .subscribe({
+                    startActivityForResult(VideoGalleryActivity.newIntent(this),
+                            VideoGalleryActivity.REQ_CODE_GALLERY)
+                }, {}))
     }
 
     override fun onStart() {
@@ -124,9 +153,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        disposable.clear()
+    }
+
     override fun onNewIntent(intent: Intent?) {
         releasePlayer()
-        shouldAutoPlay = true
         clearResumePosition()
         setIntent(intent)
     }
@@ -135,11 +168,13 @@ class MainActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (data != null && resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                REQ_CODE_MAIN -> {
+                VideoGalleryActivity.REQ_CODE_GALLERY -> {
                     val uriPath = data.extras?.getString(Constant.VIDEO_URI)
                     uriPath?.let {
-                        player?.prepare(buildMediaSource(Uri.parse(it), null), true, false)
+                        videoUri = Uri.parse(it)
+                        rangeTrimView.videoUri = videoUri
                     }
+
                 }
             }
         }
@@ -203,9 +238,9 @@ class MainActivity : AppCompatActivity() {
             player?.seekTo(resumeWindow ?: 0, resumePosition ?: 0)
         }
 
-//        val uri = Uri.parse("http://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_30mb.mp4")
-        val uri = Uri.parse("http://cdn2.teads.tv/scala/1562/285efe2ff80f8bd811c8a638eb901f2c/320.mp4")
-        player?.prepare(buildMediaSource(uri, null), !haveResumePosition, false)
+        videoUri?.let {
+            player?.prepare(buildMediaSource(it, null), !haveResumePosition, false)
+        }
         updateRenderIndices()
     }
 
