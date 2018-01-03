@@ -4,6 +4,7 @@
 	<!-- RangeTrimView -->
 	<declare-styleable name="RangeTrimView">
 		<attr name="range_trimmer_sidePadding" format="dimension" />
+		<attr name="range_trimmer_widthOfStartAndEnd" format="dimension" />
 	</declare-styleable>
 
 </resources>
