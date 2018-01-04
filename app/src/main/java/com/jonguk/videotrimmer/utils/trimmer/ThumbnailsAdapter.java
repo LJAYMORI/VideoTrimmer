@@ -1,5 +1,6 @@
 package com.jonguk.videotrimmer.utils.trimmer;
 
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,13 +18,13 @@ import java.util.List;
 class ThumbnailsAdapter extends RecyclerView.Adapter<ThumbnailsAdapter.ThumbnailViewHolder> {
 
     private final int mViewHolderWidth;
-    private final List<String> mItems = new ArrayList<>();
+    private final List<Bitmap> mItems = new ArrayList<>();
 
     public ThumbnailsAdapter(int viewHolderWidth) {
         mViewHolderWidth = viewHolderWidth;
     }
 
-    void setItems(List<String> list) {
+    void setItems(ArrayList<Bitmap> list) {
         mItems.clear();
         mItems.addAll(list);
         notifyDataSetChanged();
@@ -32,9 +33,7 @@ class ThumbnailsAdapter extends RecyclerView.Adapter<ThumbnailsAdapter.Thumbnail
     @Override
     public ThumbnailViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         ImageView v = new ImageView(parent.getContext());
-        ViewGroup.LayoutParams lp = v.getLayoutParams();
-        lp.width = mViewHolderWidth;
-        lp.height = ViewGroup.LayoutParams.MATCH_PARENT;
+        v.setLayoutParams(new ViewGroup.LayoutParams(mViewHolderWidth, ViewGroup.LayoutParams.MATCH_PARENT));
         return new ThumbnailViewHolder(v);
     }
 

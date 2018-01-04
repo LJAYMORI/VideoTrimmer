@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
     private val videoView by lazy { exo_player_view }
     private val playOrPauseView by lazy { play_or_pause_view }
     private val rangeTrimView by lazy { range_trim_view }
-//    private val mediaControlView by lazy { media_controller_view }
 
     private var mainHandler: Handler? = null
     private var eventLogger: EventLogger? = null
@@ -67,12 +66,6 @@ class MainActivity : AppCompatActivity() {
     private var videoRenderIndex = -1
     private var videoTurnOff: Boolean = false
 
-    private var videoUri: Uri? = null
-        private set(value) {
-            field = value
-            playOrPauseView.visibility = if (value == null) View.GONE else View.VISIBLE
-        }
-
     private val disposable = CompositeDisposable()
 
     companion object {
@@ -83,6 +76,12 @@ class MainActivity : AppCompatActivity() {
     init {
         defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER)
     }
+
+    private var videoUri: Uri? = null
+        private set(value) {
+            field = value
+            playOrPauseView.visibility = if (value == null) View.GONE else View.VISIBLE
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         clearResumePosition()

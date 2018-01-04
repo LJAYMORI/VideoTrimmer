@@ -19,8 +19,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.jonguk.videotrimmer.R
 import com.jonguk.videotrimmer.utils.Constant
-import com.jonguk.videotrimmer.utils.MediaLoaderCallback.Companion.PROJECTION
-import com.jonguk.videotrimmer.utils.MediaLoaderCallback.Companion.SELECTION
 import kotlinx.android.synthetic.main.activity_gallery.*
 
 /**
@@ -31,6 +29,20 @@ class VideoGalleryActivity : AppCompatActivity() {
     companion object {
         @JvmStatic val REQ_CODE_GALLERY = 123
         @JvmStatic fun newIntent(context: Context): Intent = Intent(context, VideoGalleryActivity::class.java)
+
+        @JvmStatic val PROJECTION = arrayOf(
+                MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DATA,
+                MediaStore.Files.FileColumns.MEDIA_TYPE,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.WIDTH,
+                MediaStore.Files.FileColumns.HEIGHT,
+                MediaStore.Images.ImageColumns.ORIENTATION,
+                MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                MediaStore.Video.VideoColumns.DURATION)
+
+        @JvmStatic val SELECTION = (MediaStore.Files.FileColumns.MEDIA_TYPE + "="
+                + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO)
     }
 
     private val recyclerView by lazy { gallery_recyclerview }

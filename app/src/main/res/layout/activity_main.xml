@@ -11,7 +11,9 @@
 		android:id="@+id/range_trim_view"
 		android:layout_width="match_parent"
 		android:layout_height="120dp"
-		app:layout_constraintBottom_toBottomOf="parent" />
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:range_trimmer_minFrame="10"
+		app:range_trimmer_maxFrame="40" />
 
 	<com.google.android.exoplayer2.ui.SimpleExoPlayerView
 		android:id="@+id/exo_player_view"

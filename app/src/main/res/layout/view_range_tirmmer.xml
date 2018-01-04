@@ -30,13 +30,14 @@
 		android:id="@+id/range_trimmer_thumbnails_recycler"
 		android:layout_width="match_parent"
 		android:layout_height="@dimen/range_trim_thumbnails_default_height"
+		android:clipToPadding="false"
 		app:layout_constraintTop_toBottomOf="@id/range_trimmer_start_time_view" />
 
 	<View
 		android:id="@+id/range_trimmer_start_gradient_view"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
-		android:background="#55d2d2d2"
+		android:background="#88000000"
 		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_start_handle_view"
 		app:layout_constraintEnd_toStartOf="@id/range_trimmer_start_handle_view"
 		app:layout_constraintStart_toStartOf="parent"
@@ -47,7 +48,7 @@
 		android:id="@+id/range_trimmer_end_gradient_view"
 		android:layout_width="0dp"
 		android:layout_height="0dp"
-		android:background="#55d2d2d2"
+		android:background="#88000000"
 		app:layout_constraintBottom_toBottomOf="@id/range_trimmer_end_handle_view"
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toEndOf="@id/range_trimmer_end_handle_view"
